@@ -20,6 +20,28 @@ export function generateVCard(card: CardData): string {
   if (card.facebook) {
     lines.push(`X-SOCIALPROFILE;TYPE=facebook:${card.facebook}`);
   }
+  if (card.linkedin) {
+    lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${card.linkedin}`);
+  }
+  if (card.tiktok) {
+    const handle = card.tiktok.replace('@', '');
+    lines.push(`X-SOCIALPROFILE;TYPE=tiktok:https://tiktok.com/@${handle}`);
+  }
+  if (card.twitter) {
+    const handle = card.twitter.replace('@', '');
+    lines.push(`X-SOCIALPROFILE;TYPE=twitter:https://x.com/${handle}`);
+  }
+  if (card.youtube) {
+    lines.push(`X-SOCIALPROFILE;TYPE=youtube:${card.youtube}`);
+  }
+  if (card.whatsapp) {
+    const num = card.whatsapp.replace(/\D/g, '');
+    lines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${num}`);
+  }
+  if (card.threads) {
+    const handle = card.threads.replace('@', '');
+    lines.push(`X-SOCIALPROFILE;TYPE=threads:https://threads.net/@${handle}`);
+  }
 
   lines.push('END:VCARD');
   return lines.join('\r\n');

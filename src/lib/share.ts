@@ -16,12 +16,13 @@ export function decodeCardFromHash(hash: string): CardData | null {
 
 export function getShareableUrl(card: CardData): string {
   const encoded = encodeCardToHash(card);
-  return `${window.location.origin}${window.location.pathname}#data=${encoded}`;
+  const base = window.location.href.split('#')[0];
+  return `${base}#/?data=${encoded}`;
 }
 
 export function getCardFromUrl(): CardData | null {
   const hash = window.location.hash;
-  if (!hash.startsWith('#data=')) return null;
-  const encoded = hash.slice(6);
-  return decodeCardFromHash(encoded);
+  const match = hash.match(/[?&]data=([^&]+)/);
+  if (!match) return null;
+  return decodeCardFromHash(match[1]);
 }

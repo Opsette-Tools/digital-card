@@ -1,4 +1,4 @@
-export type CardStyle = 'modern' | 'clean' | 'bold';
+export type CardStyle = 'modern' | 'clean' | 'bold' | 'minimal' | 'neon';
 
 export interface CardData {
   fullName: string;
@@ -9,10 +9,17 @@ export interface CardData {
   website: string;
   instagram: string;
   facebook: string;
+  linkedin: string;
+  tiktok: string;
+  twitter: string;
+  youtube: string;
+  whatsapp: string;
+  threads: string;
   address: string;
   photo: string;
   accentColor: string;
   cardStyle: CardStyle;
+  showInitials: boolean;
 }
 
 export const emptyCard: CardData = {
@@ -24,10 +31,17 @@ export const emptyCard: CardData = {
   website: '',
   instagram: '',
   facebook: '',
+  linkedin: '',
+  tiktok: '',
+  twitter: '',
+  youtube: '',
+  whatsapp: '',
+  threads: '',
   address: '',
   photo: '',
-  accentColor: '#1a1a2e',
+  accentColor: '#2D3748',
   cardStyle: 'modern',
+  showInitials: true,
 };
 
 export const demoCard: CardData = {
@@ -39,8 +53,15 @@ export const demoCard: CardData = {
   website: 'https://glowstudio.com',
   instagram: '@glowstudio',
   facebook: 'https://facebook.com/glowstudio',
+  linkedin: 'https://linkedin.com/in/jordanrivera',
+  tiktok: '@glowstudio',
+  twitter: '',
+  youtube: '',
+  whatsapp: '',
+  threads: '',
   address: '742 Elm Street, Suite 3, Portland, OR 97205',
   photo: '',
-  accentColor: '#6d28d9',
+  accentColor: '#4A6741',
   cardStyle: 'modern',
+  showInitials: true,
 };

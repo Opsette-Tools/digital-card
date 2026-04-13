@@ -1,7 +1,7 @@
 {
-  "name": "Business Card Builder",
-  "short_name": "CardBuilder",
-  "start_url": "/",
+  "name": "Digital Card Builder",
+  "short_name": "DigitalCard",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a1a2e",
