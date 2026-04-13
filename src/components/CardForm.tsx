@@ -10,10 +10,10 @@ interface CardFormProps {
   onChange: (card: CardData) => void;
 }
 
-const STYLES: { value: CardStyle; label: string }[] = [
-  { value: 'modern', label: 'Modern' },
-  { value: 'clean', label: 'Clean' },
-  { value: 'bold', label: 'Bold' },
+const STYLES: { value: CardStyle; label: string; description: string }[] = [
+  { value: 'modern', label: 'Monogram Panel', description: 'Large first + last initials on a side block' },
+  { value: 'clean', label: 'Wordmark Badge', description: 'Initials badge sits beside the business name' },
+  { value: 'bold', label: 'Signature Band', description: 'Dramatic full-bleed card with a contact band' },
 ];
 
 const COLORS = ['#1a1a2e', '#6d28d9', '#0369a1', '#059669', '#dc2626', '#d97706', '#db2777'];
@@ -91,19 +91,24 @@ const CardForm: React.FC<CardFormProps> = ({ card, onChange }) => {
       </div>
 
       <div>
-        <Label>Card Style</Label>
-        <div className="flex gap-2 mt-1">
-          {STYLES.map(s => (
-            <Button
-              key={s.value}
-              variant={card.cardStyle === s.value ? 'default' : 'outline'}
-              size="sm"
-              className="min-h-[44px] flex-1"
-              onClick={() => set('cardStyle', s.value)}
-            >
-              {s.label}
-            </Button>
-          ))}
+        <Label>Card Concept</Label>
+        <div className="mt-2 grid gap-2">
+          {STYLES.map(style => {
+            const selected = card.cardStyle === style.value;
+            return (
+              <Button
+                key={style.value}
+                variant={selected ? 'default' : 'outline'}
+                className="h-auto min-h-[60px] w-full justify-start px-4 py-3 text-left"
+                onClick={() => set('cardStyle', style.value)}
+              >
+                <span className="flex flex-col items-start gap-1">
+                  <span className="font-medium leading-none">{style.label}</span>
+                  <span className={selected ? 'text-xs opacity-80' : 'text-xs text-muted-foreground'}>{style.description}</span>
+                </span>
+              </Button>
+            );
+          })}
         </div>
       </div>
 
