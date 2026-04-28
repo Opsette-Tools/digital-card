@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Typography, theme as antdTheme } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import AppLogo from '@/components/AppLogo';
+import { ShareAppButton, OpsetteFooterLogo } from '@/components/opsette-share';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -30,6 +31,9 @@ const About: React.FC = () => {
             <AppLogo size={28} />
             <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: token.colorText }}>CardCraft</span>
           </button>
+          <div style={{ marginLeft: 'auto' }}>
+            <ShareAppButton />
+          </div>
         </div>
       </header>
 
@@ -75,11 +79,9 @@ const About: React.FC = () => {
             Everything is stored in your browser. Nothing is sent to any server. Shared links encode your card data directly in the URL — no backend required.
           </Paragraph>
 
-          <Paragraph type="secondary" style={{ fontSize: 12, marginTop: 16 }}>
-            A business tool from Opsette Marketplace. Find more tools at{' '}
-            <a href="https://opsette.io" target="_blank" rel="noopener noreferrer">opsette.io</a>.
-          </Paragraph>
         </Typography>
+
+        <OpsetteFooterLogo />
       </main>
     </div>
   );

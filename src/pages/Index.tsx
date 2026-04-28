@@ -9,6 +9,7 @@ import CardForm from '@/components/CardForm';
 import CardPreview from '@/components/CardPreview';
 import ActionBar from '@/components/ActionBar';
 import SharedCardView from '@/components/SharedCardView';
+import { ShareAppButton } from '@/components/opsette-share';
 
 const STORAGE_KEY = 'business-card-data';
 
@@ -98,6 +99,9 @@ const Index: React.FC = () => {
         <div style={{ maxWidth: headerInnerMaxWidth, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 10, padding: headerInnerPadding }}>
           <AppLogo size={28} />
           <h1 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: token.colorText, margin: 0 }}>CardCraft</h1>
+          <div style={{ marginLeft: 'auto' }}>
+            <ShareAppButton />
+          </div>
         </div>
       </header>
 
