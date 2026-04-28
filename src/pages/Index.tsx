@@ -81,7 +81,7 @@ const Index: React.FC = () => {
         </div>
 
         <div className="animate-scale-in" style={{ animationDelay: '0.05s' }}>
-          <CardPreview card={card} cardRef={cardRef} />
+          <CardPreview card={card} cardRef={cardRef} showGuides={card.showPrintGuides} />
         </div>
 
         <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>

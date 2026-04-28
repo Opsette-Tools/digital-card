@@ -1,5 +1,7 @@
 export type CardStyle = 'modern' | 'clean' | 'bold' | 'minimal' | 'neon' | 'profile' | 'split' | 'stacked';
 
+export type CardSize = 'us-business' | 'eu-business' | 'square';
+
 export interface CardData {
   fullName: string;
   title: string;
@@ -20,6 +22,8 @@ export interface CardData {
   accentColor: string;
   cardStyle: CardStyle;
   showInitials: boolean;
+  cardSize: CardSize;
+  showPrintGuides: boolean;
 }
 
 export const emptyCard: CardData = {
@@ -42,6 +46,8 @@ export const emptyCard: CardData = {
   accentColor: '#2D3748',
   cardStyle: 'modern',
   showInitials: true,
+  cardSize: 'us-business',
+  showPrintGuides: false,
 };
 
 export const demoCard: CardData = {
@@ -64,4 +70,9 @@ export const demoCard: CardData = {
   accentColor: '#4A6741',
   cardStyle: 'modern',
   showInitials: true,
+  cardSize: 'us-business',
+  showPrintGuides: false,
 };
+
+export const BUSINESS_STYLES: CardStyle[] = ['modern', 'clean', 'bold', 'minimal', 'neon'];
+export const isBusinessStyle = (s: CardStyle) => BUSINESS_STYLES.includes(s);

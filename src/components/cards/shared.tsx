@@ -1,9 +1,12 @@
 import React from 'react';
 import { CardData } from '@/types/card';
+import type { Dimensions } from '@/lib/print';
 
 export interface CardTemplateProps {
   card: CardData;
   cardRef?: React.RefObject<HTMLDivElement>;
+  /** When present, business templates use this aspect ratio instead of the legacy 1.75/1. */
+  dimensions?: Dimensions;
 }
 
 export type ContactEntry = { icon: React.FC<{ size?: number; style?: React.CSSProperties }>; label: string; href?: string };
@@ -57,6 +60,14 @@ export const buildContacts = (card: CardData): ContactEntry[] =>
     card.threads ? { icon: Icons.threads, label: card.threads, href: `https://threads.net/@${card.threads.replace('@', '')}` } : null,
     card.address ? { icon: Icons.pin, label: card.address } : null,
   ].filter(Boolean) as ContactEntry[];
+
+/** Splits contacts so address gets its own full-width row, with the icon grid capped. */
+export const splitContacts = (card: CardData, max = 6): { items: ContactEntry[]; address?: ContactEntry } => {
+  const all = buildContacts(card);
+  const address = all.find(e => e.icon === Icons.pin);
+  const rest = all.filter(e => e.icon !== Icons.pin).slice(0, max);
+  return { items: rest, address };
+};
 
 // Social-only contacts (for icon rows)
 export const buildSocials = (card: CardData): ContactEntry[] =>

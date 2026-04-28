@@ -1,6 +1,7 @@
 import React from 'react';
-import { Select, Switch, Tooltip, theme as antdTheme } from 'antd';
-import { CardData, CardStyle } from '@/types/card';
+import { Segmented, Select, Switch, Tooltip, theme as antdTheme } from 'antd';
+import { CardData, CardStyle, CardSize, isBusinessStyle } from '@/types/card';
+import { SIZE_OPTIONS, getDimensions } from '@/lib/print';
 
 interface StyleBarProps {
   card: CardData;
@@ -37,7 +38,9 @@ const COLORS = [
 
 const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
   const { token } = antdTheme.useToken();
-  const set = (key: keyof CardData, value: string | boolean) => onChange({ ...card, [key]: value });
+  const set = <K extends keyof CardData>(key: K, value: CardData[K]) => onChange({ ...card, [key]: value });
+  const isBusiness = isBusinessStyle(card.cardStyle);
+  const dims = getDimensions(card.cardSize);
 
   const options = STYLE_GROUPS.map(group => ({
     label: (
@@ -115,6 +118,43 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
           <span style={{ fontSize: 11, color: token.colorTextSecondary, userSelect: 'none' }}>AB</span>
         </div>
       </div>
+
+      {isBusiness && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            paddingTop: 10,
+            borderTop: `1px dashed ${token.colorBorderSecondary}`,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Print size</span>
+            <Segmented<CardSize>
+              size="small"
+              value={card.cardSize}
+              onChange={(v) => set('cardSize', v as CardSize)}
+              options={SIZE_OPTIONS}
+            />
+          </div>
+          {dims.showGuides && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Show print guides</span>
+              <Tooltip
+                title="Green = safe area (keep text inside). Red = bleed (extend art past). Editor only — never appears in exports."
+                mouseEnterDelay={0.4}
+              >
+                <Switch
+                  size="small"
+                  checked={card.showPrintGuides}
+                  onChange={(checked) => set('showPrintGuides', checked)}
+                />
+              </Tooltip>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
