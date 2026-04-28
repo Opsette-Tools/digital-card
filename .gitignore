@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Planning / scratch docs (not committed)
+PLAN.md
+plan/

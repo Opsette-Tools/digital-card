@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Space, theme as antdTheme } from 'antd';
 import { CardData, emptyCard } from '@/types/card';
 import { decodeCardFromHash } from '@/lib/share';
 import AppLogo from '@/components/AppLogo';
@@ -16,6 +17,7 @@ const Index: React.FC = () => {
   const [searchParams] = useSearchParams();
   const dataParam = searchParams.get('data');
   const sharedCard = dataParam ? decodeCardFromHash(dataParam) : null;
+  const { token } = antdTheme.useToken();
 
   const [card, setCard] = useState<CardData>(() => {
     try {
@@ -39,17 +41,41 @@ const Index: React.FC = () => {
     return <SharedCardView card={sharedCard} />;
   }
 
+  const surface: React.CSSProperties = {
+    background: token.colorBgContainer,
+    borderRadius: 12,
+    border: `1px solid ${token.colorBorderSecondary}`,
+    boxShadow: '0 2px 6px -1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.04)',
+  };
+
   return (
-    <div className="min-h-[100dvh] bg-background">
-      {/* App header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-[480px] mx-auto flex items-center gap-2.5 px-4 py-3">
+    <div style={{ minHeight: '100dvh', background: token.colorBgLayout }}>
+      <header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: token.colorBgContainer,
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        }}
+      >
+        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
           <AppLogo size={28} />
-          <h1 className="text-lg font-bold tracking-tight text-foreground">CardCraft</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: token.colorText, margin: 0 }}>CardCraft</h1>
         </div>
       </header>
 
-      <main className="max-w-[480px] mx-auto px-4 py-4 space-y-4 pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <main
+        style={{
+          maxWidth: 480,
+          margin: '0 auto',
+          padding: '16px 16px max(2rem, env(safe-area-inset-bottom))',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+        }}
+      >
         <div className="animate-fade-in-up">
           <StyleBar card={card} onChange={setCard} />
         </div>
@@ -58,25 +84,40 @@ const Index: React.FC = () => {
           <CardPreview card={card} cardRef={cardRef} />
         </div>
 
-        <div className="bg-card rounded-xl p-3 border border-border/60 animate-fade-in-up" style={{ animationDelay: '0.1s', boxShadow: '0 2px 6px -1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.04)' }}>
+        <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>
           <ActionBar card={card} cardRef={cardRef} onSave={handleSave} />
         </div>
 
-        <div className="bg-card rounded-xl p-4 border border-border/60 animate-fade-in-up" style={{ animationDelay: '0.15s', boxShadow: '0 2px 6px -1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.04)' }}>
+        <div className="animate-fade-in-up" style={{ ...surface, padding: 16, animationDelay: '0.15s' }}>
           <CardForm card={card} onChange={setCard} />
         </div>
 
-        <footer className="flex items-center justify-center gap-1.5 py-3 animate-fade-in" style={{ animationDelay: '0.25s' }}>
-          <button onClick={() => navigate('/about')} className="text-xs text-muted-foreground hover:text-foreground transition-colors">How to Use</button>
-          <span className="text-muted-foreground/40">·</span>
-          <button onClick={() => navigate('/privacy')} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Privacy</button>
-          <span className="text-muted-foreground/40">·</span>
-          <span className="text-xs text-muted-foreground">
-            By{' '}
-            <a href="https://opsette.io" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
-              Opsette
-            </a>
-          </span>
+        <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }} className="animate-fade-in">
+          <Space split={<span style={{ color: token.colorTextQuaternary }}>·</span>} size="small">
+            <button
+              onClick={() => navigate('/about')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: token.colorTextSecondary, padding: 0 }}
+            >
+              How to Use
+            </button>
+            <button
+              onClick={() => navigate('/privacy')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: token.colorTextSecondary, padding: 0 }}
+            >
+              Privacy
+            </button>
+            <span style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              By{' '}
+              <a
+                href="https://opsette.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'underline' }}
+              >
+                Opsette
+              </a>
+            </span>
+          </Space>
         </footer>
       </main>
     </div>

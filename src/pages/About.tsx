@@ -1,72 +1,85 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Typography, theme as antdTheme } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import AppLogo from '@/components/AppLogo';
+
+const { Title, Paragraph, Text } = Typography;
 
 const About: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = antdTheme.useToken();
 
   return (
-    <div className="min-h-[100dvh] bg-background">
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-[480px] mx-auto flex items-center gap-2.5 px-4 py-3">
-          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 hover:opacity-70 transition-opacity">
+    <div style={{ minHeight: '100dvh', background: token.colorBgLayout }}>
+      <header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: token.colorBgContainer,
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        }}
+      >
+        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
             <AppLogo size={28} />
-            <span className="text-lg font-bold tracking-tight text-foreground">CardCraft</span>
+            <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: token.colorText }}>CardCraft</span>
           </button>
         </div>
       </header>
 
-      <main className="max-w-[480px] mx-auto px-4 py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
-        <button onClick={() => navigate('/')} className="text-xs text-muted-foreground hover:text-foreground transition-colors mb-4">
-          <span className="mr-1">&larr;</span> Back
-        </button>
+      <main style={{ maxWidth: 480, margin: '0 auto', padding: '24px 16px max(2rem, env(safe-area-inset-bottom))' }}>
+        <Button type="text" size="small" icon={<ArrowLeftOutlined />} onClick={() => navigate('/')} style={{ marginBottom: 16, paddingLeft: 0 }}>
+          Back
+        </Button>
 
-        <h1 className="text-xl font-bold tracking-tight text-foreground mb-4">How to Use</h1>
+        <Title level={3} style={{ marginTop: 0, marginBottom: 16 }}>How to Use</Title>
 
-        <div className="space-y-5 text-sm text-foreground/80 leading-relaxed">
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">1. Choose a style</h2>
-            <p>Pick from <strong>Business Card</strong> layouts (landscape, great for image export and printing) or <strong>Contact Card</strong> layouts (portrait, designed for sharing links digitally).</p>
-          </section>
+        <Typography>
+          <Title level={5} style={{ marginBottom: 6 }}>1. Choose a style</Title>
+          <Paragraph>
+            Pick from <Text strong>Business Card</Text> layouts (landscape, great for image export and printing) or <Text strong>Contact Card</Text> layouts (portrait, designed for sharing links digitally).
+          </Paragraph>
 
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">2. Fill in your details</h2>
-            <p>Enter your name, title, business, and contact info. Add social profiles under "more socials." Upload a photo or logo if you'd like.</p>
-          </section>
+          <Title level={5} style={{ marginBottom: 6 }}>2. Fill in your details</Title>
+          <Paragraph>
+            Enter your name, title, business, and contact info. Add social profiles under "Social." Upload a photo or logo if you'd like.
+          </Paragraph>
 
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">3. Customize</h2>
-            <p>Pick an accent color from the palette or use the custom picker. Toggle initials on or off with the switch.</p>
-          </section>
+          <Title level={5} style={{ marginBottom: 6 }}>3. Customize</Title>
+          <Paragraph>
+            Pick an accent color from the palette or use the custom picker. Toggle initials on or off with the switch.
+          </Paragraph>
 
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">4. Save your card</h2>
-            <p>Tap <strong>Save Card</strong> to store your card locally. It'll be here next time you open the app — no account needed.</p>
-          </section>
+          <Title level={5} style={{ marginBottom: 6 }}>4. Save your card</Title>
+          <Paragraph>
+            Tap <Text strong>Save Card</Text> to store your card locally. It'll be here next time you open the app — no account needed.
+          </Paragraph>
 
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">5. Share it</h2>
-            <p>You have several ways to share:</p>
-            <ul className="mt-1.5 space-y-1 pl-4">
-              <li className="flex items-start gap-2"><span className="text-muted-foreground shrink-0">Link</span> <span>— copies a shareable URL that shows your card in the browser</span></li>
-              <li className="flex items-start gap-2"><span className="text-muted-foreground shrink-0">Image</span> <span>— downloads a PNG of your card for social media or printing</span></li>
-              <li className="flex items-start gap-2"><span className="text-muted-foreground shrink-0">QR</span> <span>— generates a QR code that links to your card</span></li>
-              <li className="flex items-start gap-2"><span className="text-muted-foreground shrink-0">vCard</span> <span>— downloads a .vcf file that adds your info (including photo) directly to someone's contacts</span></li>
-            </ul>
-          </section>
+          <Title level={5} style={{ marginBottom: 6 }}>5. Share it</Title>
+          <Paragraph>You have several ways to share:</Paragraph>
+          <ul style={{ paddingLeft: 18, marginTop: 0, marginBottom: 16 }}>
+            <li><Text type="secondary">Link</Text> — copies a shareable URL that shows your card in the browser</li>
+            <li><Text type="secondary">Image</Text> — downloads a PNG of your card for social media or printing</li>
+            <li><Text type="secondary">QR</Text> — generates a QR code that links to your card</li>
+            <li><Text type="secondary">vCard</Text> — downloads a .vcf file that adds your info (including photo) directly to someone's contacts</li>
+          </ul>
 
-          <section>
-            <h2 className="font-semibold text-foreground mb-1.5">Your data stays local</h2>
-            <p>Everything is stored in your browser. Nothing is sent to any server. Shared links encode your card data directly in the URL — no backend required.</p>
-          </section>
+          <Title level={5} style={{ marginBottom: 6 }}>Your data stays local</Title>
+          <Paragraph>
+            Everything is stored in your browser. Nothing is sent to any server. Shared links encode your card data directly in the URL — no backend required.
+          </Paragraph>
 
-          <p className="text-xs text-muted-foreground/70 pt-2">
+          <Paragraph type="secondary" style={{ fontSize: 12, marginTop: 16 }}>
             A business tool from Opsette Marketplace. Find more tools at{' '}
-            <a href="https://opsette.io" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
-              opsette.io
-            </a>.
-          </p>
-        </div>
+            <a href="https://opsette.io" target="_blank" rel="noopener noreferrer">opsette.io</a>.
+          </Paragraph>
+        </Typography>
       </main>
     </div>
   );

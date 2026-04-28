@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Button, App as AntApp, theme as antdTheme } from 'antd';
+import { IdcardOutlined, QrcodeOutlined, LinkOutlined } from '@ant-design/icons';
 import { CardData } from '@/types/card';
 import CardPreview from './CardPreview';
 import QrModal from './QrModal';
 import AppLogo from './AppLogo';
 import { downloadVCard } from '@/lib/vcard';
-import { toast } from 'sonner';
 
 interface SharedCardViewProps {
   card: CardData;
@@ -12,54 +13,63 @@ interface SharedCardViewProps {
 
 const SharedCardView: React.FC<SharedCardViewProps> = ({ card }) => {
   const [qrOpen, setQrOpen] = useState(false);
+  const { message } = AntApp.useApp();
+  const { token } = antdTheme.useToken();
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
-    toast.success('Link copied');
+    message.success('Link copied');
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background">
-      {/* Minimal header */}
-      <header className="bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-[480px] mx-auto flex items-center gap-2.5 px-4 py-3">
+    <div style={{ minHeight: '100dvh', background: token.colorBgLayout }}>
+      <header
+        style={{
+          background: token.colorBgContainer,
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        }}
+      >
+        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
           <AppLogo size={24} />
-          <span className="text-sm font-bold tracking-tight text-foreground">CardCraft</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: token.colorText }}>CardCraft</span>
         </div>
       </header>
 
-      <main className="max-w-[480px] mx-auto px-4 py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <main style={{ maxWidth: 480, margin: '0 auto', padding: '24px 16px', paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
         <div className="animate-scale-in">
           <CardPreview card={card} />
         </div>
 
-        <div className="mt-4 bg-card rounded-xl p-3 border border-border/60 animate-fade-in-up" style={{ animationDelay: '0.1s', boxShadow: '0 2px 6px -1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.04)' }}>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => { downloadVCard(card); toast.success('Contact saved'); }}
-              className="flex items-center justify-center gap-1.5 text-xs font-medium h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 active:scale-[0.98] transition-all col-span-2"
+        <div
+          style={{
+            marginTop: 16,
+            background: token.colorBgContainer,
+            borderRadius: 12,
+            padding: 12,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            boxShadow: '0 2px 6px -1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <Button
+              type="primary"
+              icon={<IdcardOutlined />}
+              onClick={() => { downloadVCard(card); message.success('Contact saved'); }}
+              style={{ height: 40, gridColumn: 'span 2' }}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 2h3v12H3V2h3M6 2a2 2 0 114 0M6 8h4M6 10.5h2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
               Save Contact
-            </button>
-            <button
-              onClick={() => setQrOpen(true)}
-              className="flex items-center justify-center gap-1.5 text-xs font-medium h-10 rounded-lg border border-border hover:bg-accent active:scale-[0.98] transition-all text-foreground"
-            >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1.2"/><rect x="9" y="2" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1.2"/><rect x="2" y="9" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1.2"/><rect x="10" y="10" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.2"/></svg>
+            </Button>
+            <Button icon={<QrcodeOutlined />} onClick={() => setQrOpen(true)} style={{ height: 40 }}>
               QR
-            </button>
-            <button
-              onClick={copyLink}
-              className="flex items-center justify-center gap-1.5 text-xs font-medium h-10 rounded-lg border border-border hover:bg-accent active:scale-[0.98] transition-all text-foreground col-span-3"
-            >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5l3-3M9 6a2.5 2.5 0 013.5 3.5l-2 2A2.5 2.5 0 017 8M7 10a2.5 2.5 0 01-3.5-3.5l2-2A2.5 2.5 0 019 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+            </Button>
+            <Button icon={<LinkOutlined />} onClick={copyLink} style={{ height: 40, gridColumn: 'span 3' }}>
               Copy Link
-            </button>
+            </Button>
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <p style={{ textAlign: 'center', fontSize: 10, color: token.colorTextTertiary, marginTop: 16 }}>
           Made with CardCraft
         </p>
       </main>
