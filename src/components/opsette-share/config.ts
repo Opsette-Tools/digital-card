@@ -12,5 +12,5 @@ export const opsetteShareConfig: OpsetteShareConfig = {
   appName: "CardCraft",
   tagline: "Create and share your digital business card.",
   url: "https://tools.opsette.io/digital-card/",
-  logoSrc: "/digital-card/opsette-logo.png",
+  logoSrc: "opsette-logo.png",
 };
