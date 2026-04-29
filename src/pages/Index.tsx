@@ -4,6 +4,7 @@ import { Space, Grid, theme as antdTheme } from 'antd';
 import { CardData, emptyCard } from '@/types/card';
 import { decodeCardFromHash } from '@/lib/share';
 import { OpsetteHeader } from '@/components/opsette-header';
+import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import StyleBar from '@/components/StyleBar';
 import CardForm from '@/components/CardForm';
 import CardPreview from '@/components/CardPreview';
@@ -82,7 +83,7 @@ const Index: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100dvh', background: token.colorBgLayout }}>
-      <OpsetteHeader />
+      <OpsetteHeader rightExtra={<ThemeToggleButton />} />
 
       {isDesktop ? (
         <main
