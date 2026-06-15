@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+﻿import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/digital-card/",
   server: {
     host: "::",
-    port: 8080,
+    port: 8104,
     hmr: {
       overlay: false,
     },
