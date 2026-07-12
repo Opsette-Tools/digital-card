@@ -69,7 +69,7 @@ const SharedCardView: React.FC<SharedCardViewProps> = ({ card }) => {
             type="primary"
             size="large"
             icon={<IdcardOutlined />}
-            onClick={() => { downloadVCard(card); message.success('Contact saved'); }}
+            onClick={async () => { await downloadVCard(card); message.success('Contact saved'); }}
             block
             style={{ height: 52, fontSize: 16, fontWeight: 600 }}
           >

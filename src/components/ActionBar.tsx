@@ -8,26 +8,32 @@ import {
   QrcodeOutlined,
   IdcardOutlined,
   SaveOutlined,
+  AppstoreAddOutlined,
 } from '@ant-design/icons';
 import QRCode from 'qrcode';
 import { CardData, isBusinessStyle, isHandoutStyle } from '@/types/card';
 import { getShareableUrl } from '@/lib/share';
 import { downloadVCard } from '@/lib/vcard';
 import { getDimensions } from '@/lib/print';
-import { exportWebImage, exportPrintImage } from '@/lib/export';
+import { exportWebImage, exportPrintImage, renderWebImage } from '@/lib/export';
+import { toKitJson } from '@/lib/brandKit';
 import QrModal from './QrModal';
 import PrintCard from './PrintCard';
+import ReopenCardModal from './ReopenCardModal';
 import { ShareAppModal } from '@/components/opsette-share';
 
 interface ActionBarProps {
   card: CardData;
   cardRef: React.RefObject<HTMLDivElement>;
   onSave: () => void;
+  onReopen: (card: CardData) => void;
 }
 
-const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave }) => {
+const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave, onReopen }) => {
   const [qrOpen, setQrOpen] = useState(false);
   const [shareAppOpen, setShareAppOpen] = useState(false);
+  const [reopenOpen, setReopenOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [captureContainer, setCaptureContainer] = useState<HTMLDivElement | null>(null);
   const printCardRef = useRef<HTMLDivElement>(null);
   const { message } = AntApp.useApp();
@@ -96,10 +102,42 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave }) => {
     }
   };
 
-  const handleVCard = () => {
+  const handleVCard = async () => {
     if (!requireName()) return;
-    downloadVCard(card);
+    await downloadVCard(card);
     message.success('Contact downloaded');
+  };
+
+  // Bake the rendered card PNG + the .vcf into one blob and copy it to the
+  // clipboard. Brand Board stores the image (→ File Builder reconstructs
+  // digital_card.png) and the .vcf (the "add to contacts" half), so the card
+  // finally flows into the kit with no manual download. Reopen reads data.card.
+  const exportToBrandBoard = async () => {
+    if (!requireName()) return;
+    setExporting(true);
+    try {
+      // Best-effort image capture — a failed capture still yields a valid,
+      // reopen-able blob (with the vcard), it just won't carry the visual.
+      let image: string | undefined;
+      if (cardRef.current) {
+        try {
+          image = await renderWebImage(cardRef.current);
+        } catch {
+          image = undefined;
+        }
+      }
+      const payload = await toKitJson(card, image);
+      await navigator.clipboard.writeText(JSON.stringify(payload));
+      message.success(
+        image
+          ? 'Copied to clipboard — paste into Brand Board (card + contact file)'
+          : 'Copied — card preview couldn’t be captured, but the contact file is included',
+      );
+    } catch {
+      message.error('Export failed');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleSave = () => {
@@ -206,7 +244,23 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave }) => {
         </div>
       )}
 
-      <div style={{ textAlign: 'center', marginTop: 10 }}>
+      <Button
+        icon={<AppstoreAddOutlined />}
+        onClick={exportToBrandBoard}
+        loading={exporting}
+        block
+        style={{ height: 40, marginTop: 8 }}
+      >
+        Export to Brand Board
+      </Button>
+
+      <div style={{ textAlign: 'center', marginTop: 6 }}>
+        <Button type="link" size="small" onClick={() => setReopenOpen(true)} style={{ fontSize: 12 }}>
+          Reopen a saved card
+        </Button>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 2 }}>
         <Button type="link" size="small" onClick={() => setShareAppOpen(true)} style={{ fontSize: 12 }}>
           Or share the Digital Card app itself →
         </Button>
@@ -214,6 +268,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave }) => {
 
       <QrModal card={card} open={qrOpen} onClose={() => setQrOpen(false)} />
       <ShareAppModal open={shareAppOpen} onClose={() => setShareAppOpen(false)} />
+      <ReopenCardModal open={reopenOpen} onClose={() => setReopenOpen(false)} onReopen={onReopen} />
 
       {captureContainer && createPortal(
         <PrintCard card={card} dimensions={dims} outerRef={printCardRef} />,

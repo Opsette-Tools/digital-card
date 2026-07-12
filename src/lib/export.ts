@@ -16,10 +16,20 @@ const ensureFontsReady = async () => {
   }
 };
 
+/**
+ * Web-quality PNG of an on-screen card, returned as a data URL (no download).
+ * Same capture settings as `exportWebImage` so the baked kit image and the
+ * downloaded image are identical. Used to bake the card PNG into the Brand Kit
+ * blob.
+ */
+export const renderWebImage = async (node: HTMLElement): Promise<string> => {
+  await ensureFontsReady();
+  return toPng(node, { pixelRatio: 2, cacheBust: true, backgroundColor: undefined });
+};
+
 /** Web-quality PNG of an on-screen card. Transparent outside rounded corners. */
 export const exportWebImage = async (node: HTMLElement, filename: string) => {
-  await ensureFontsReady();
-  const dataUrl = await toPng(node, { pixelRatio: 2, cacheBust: true, backgroundColor: undefined });
+  const dataUrl = await renderWebImage(node);
   triggerDownload(dataUrl, filename);
 };
 

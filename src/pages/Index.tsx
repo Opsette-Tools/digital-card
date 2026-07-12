@@ -40,6 +40,10 @@ const Index: React.FC = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(card));
   };
 
+  const handleReopen = (reopened: CardData) => {
+    setCard(reopened);
+  };
+
   if (sharedCard) {
     return <SharedCardView card={sharedCard} />;
   }
@@ -125,7 +129,7 @@ const Index: React.FC = () => {
             </div>
 
             <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>
-              <ActionBar card={card} cardRef={cardRef} onSave={handleSave} />
+              <ActionBar card={card} cardRef={cardRef} onSave={handleSave} onReopen={handleReopen} />
             </div>
           </div>
         </main>
@@ -149,7 +153,7 @@ const Index: React.FC = () => {
           </div>
 
           <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>
-            <ActionBar card={card} cardRef={cardRef} onSave={handleSave} />
+            <ActionBar card={card} cardRef={cardRef} onSave={handleSave} onReopen={handleReopen} />
           </div>
 
           <div className="animate-fade-in-up" style={{ ...surface, padding: 16, animationDelay: '0.15s' }}>
