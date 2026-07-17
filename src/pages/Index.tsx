@@ -1,8 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Space, Grid, theme as antdTheme } from 'antd';
 import { CardData, emptyCard } from '@/types/card';
 import { decodeCardFromHash } from '@/lib/share';
+import { readSeedFromUrl, clearLinkParams } from '@/lib/opsette-kit-link';
+import { initialCardFromSeed } from '@/lib/seed';
 import { OpsetteHeader } from '@/components/opsette-header';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import StyleBar from '@/components/StyleBar';
@@ -23,6 +25,16 @@ const Index: React.FC = () => {
   const isDesktop = !!screens.md;
 
   const [card, setCard] = useState<CardData>(() => {
+    // A ?seed= brand core (Mechanism 1) wins over the last-saved card: arriving
+    // from the "New client kit" starter should open on THIS client's name +
+    // accent, not whatever card was built last. No seed → restore localStorage,
+    // exactly as before.
+    const core = readSeedFromUrl();
+    if (core) {
+      const seeded = initialCardFromSeed(core);
+      // Only take the seed path when it actually filled something.
+      if (JSON.stringify(seeded) !== JSON.stringify(emptyCard)) return seeded;
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -35,6 +47,13 @@ const Index: React.FC = () => {
     }
   });
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Strip the seed param from the address bar once consumed, so a refresh
+  // doesn't re-seed over edits. (The ?data= share param is left to its own
+  // flow.)
+  useEffect(() => {
+    clearLinkParams();
+  }, []);
 
   const handleSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(card));
