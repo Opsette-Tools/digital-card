@@ -7,36 +7,29 @@ import {
   HandoutVariant,
   HandoutTheme,
   HandoutLogoSize,
-  isBusinessStyle,
   isHandoutStyle,
 } from '@/types/card';
-import { SIZE_OPTIONS, HANDOUT_SIZE_OPTIONS, getDimensions } from '@/lib/print';
-import { FONT_OPTIONS } from '@/lib/fonts';
+import { HANDOUT_SIZE_OPTIONS } from '@/lib/print';
+import { FONT_OPTIONS } from '@/lib/handout-fonts';
+import { OpsetteFontPicker } from '@/components/opsette-font-picker';
 
 interface StyleBarProps {
   card: CardData;
   onChange: (card: CardData) => void;
 }
 
+// Business-card templates were cut in the shrink-to-real pass (§1a). What's left
+// is the contact cards (the real visual output) + the handout (spun off later).
 const STYLE_GROUPS: { group: string; hint: string; items: { value: CardStyle; label: string }[] }[] = [
   {
-    group: 'Business Card',
-    hint: 'for image export',
-    items: [
-      { value: 'modern', label: 'Monogram' },
-      { value: 'clean', label: 'Wordmark' },
-      { value: 'bold', label: 'Full Bleed' },
-      { value: 'minimal', label: 'Editorial' },
-      { value: 'neon', label: 'Dark Mode' },
-    ],
-  },
-  {
     group: 'Contact Card',
-    hint: 'for sharing links',
+    hint: 'share or paste anywhere',
     items: [
       { value: 'profile', label: 'Profile' },
       { value: 'split', label: 'Split' },
       { value: 'stacked', label: 'Stacked' },
+      { value: 'type', label: 'Type' },
+      { value: 'photo', label: 'Photo' },
     ],
   },
   {
@@ -71,6 +64,8 @@ interface FontSelectProps {
   onChange: (v: string) => void;
 }
 
+// Legacy single-font <Select> — used ONLY by the handout's three font rows,
+// which stay on the old private font list (the handout is untouched, §1c).
 const FontSelect: React.FC<FontSelectProps> = ({ value, onChange }) => {
   const selected = FONT_OPTIONS.find(f => f.value === value) ?? FONT_OPTIONS[0];
   return (
@@ -144,14 +139,12 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
     if (isHandoutStyle(next) && !cardSize.startsWith('handout-')) {
       cardSize = 'handout-4x6';
     } else if (!isHandoutStyle(next) && cardSize.startsWith('handout-')) {
-      cardSize = 'us-business';
+      cardSize = 'square';
     }
     onChange({ ...card, cardStyle: next, cardSize });
   };
 
-  const isBusiness = isBusinessStyle(card.cardStyle);
   const isHandout = isHandoutStyle(card.cardStyle);
-  const dims = getDimensions(card.cardSize);
 
   const options = STYLE_GROUPS.map(group => ({
     label: (
@@ -165,9 +158,6 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
     title: group.group,
     options: group.items.map(item => ({ value: item.value, label: item.label })),
   }));
-
-  const sizeOptions = isHandout ? HANDOUT_SIZE_OPTIONS : SIZE_OPTIONS;
-  const showSizeRow = isBusiness || isHandout;
 
   return (
     <div
@@ -280,19 +270,21 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
           </Tooltip>
         </div>
         {!isHandout && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Switch
-              size="small"
-              checked={card.showInitials}
-              onChange={(checked) => set('showInitials', checked)}
-              style={card.showInitials ? { backgroundColor: card.accentColor } : undefined}
-            />
-            <span style={{ fontSize: 11, color: token.colorTextSecondary, userSelect: 'none' }}>AB</span>
-          </div>
+          <Tooltip title="Show an initials avatar when there's no photo" mouseEnterDelay={0.4}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Switch
+                size="small"
+                checked={card.showInitials}
+                onChange={(checked) => set('showInitials', checked)}
+                style={card.showInitials ? { backgroundColor: card.accentColor } : undefined}
+              />
+              <span style={{ fontSize: 11, color: token.colorTextSecondary, userSelect: 'none' }}>AB</span>
+            </div>
+          </Tooltip>
         )}
       </div>
 
-      {showSizeRow && (
+      {isHandout && (
         <div
           style={{
             display: 'flex',
@@ -308,24 +300,9 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
               size="small"
               value={card.cardSize}
               onChange={(v) => set('cardSize', v as CardSize)}
-              options={sizeOptions}
+              options={HANDOUT_SIZE_OPTIONS}
             />
           </div>
-          {dims.showGuides && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Show print guides</span>
-              <Tooltip
-                title="Green = safe area (keep text inside). Red = bleed (extend art past). Editor only — never appears in exports."
-                mouseEnterDelay={0.4}
-              >
-                <Switch
-                  size="small"
-                  checked={card.showPrintGuides}
-                  onChange={(checked) => set('showPrintGuides', checked)}
-                />
-              </Tooltip>
-            </div>
-          )}
         </div>
       )}
 
@@ -354,16 +331,14 @@ const StyleBar: React.FC<StyleBarProps> = ({ card, onChange }) => {
             </div>
           </>
         ) : (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Name font</span>
-              <FontSelect value={card.nameFont} onChange={(v) => set('nameFont', v)} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Body font</span>
-              <FontSelect value={card.bodyFont} onChange={(v) => set('bodyFont', v)} />
-            </div>
-          </>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span style={{ fontSize: 11, color: token.colorTextSecondary, fontWeight: 500 }}>Fonts</span>
+            <OpsetteFontPicker
+              value={card.fontId}
+              onChange={(id) => set('fontId', id)}
+              size="middle"
+            />
+          </div>
         )}
       </div>
     </div>

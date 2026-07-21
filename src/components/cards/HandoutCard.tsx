@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { CardTemplateProps, withAlpha, darken } from './shared';
-import { resolveFontStack } from '@/lib/fonts';
+import { resolveFontStack } from '@/lib/handout-fonts';
 
 const DEFAULT_QR_TARGET = 'https://opsette.io';
 

@@ -3,7 +3,8 @@ import { Button, Input, Upload, theme as antdTheme } from 'antd';
 import type { UploadProps } from 'antd';
 import { UploadOutlined, DeleteOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { CardData, demoCard, demoHandout, emptyCard, isHandoutStyle } from '@/types/card';
-import { resolveFontStack } from '@/lib/fonts';
+import { resolveFontStack } from '@/lib/handout-fonts';
+import { headingStack, bodyStack } from '@/lib/fonts';
 import BlurbEditor from './BlurbEditor';
 
 interface CardFormProps {
@@ -198,7 +199,7 @@ const CardForm: React.FC<CardFormProps> = ({ card, onChange }) => {
               onChange={e => set('fullName', e.target.value)}
               placeholder="Jordan Rivera"
               size="large"
-              style={{ fontFamily: resolveFontStack(card.nameFont) }}
+              style={{ fontFamily: headingStack(card.fontId) }}
             />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -209,7 +210,7 @@ const CardForm: React.FC<CardFormProps> = ({ card, onChange }) => {
                 onChange={e => set('title', e.target.value)}
                 placeholder="Lead Stylist"
                 size="large"
-                style={{ fontFamily: resolveFontStack(card.bodyFont) }}
+                style={{ fontFamily: bodyStack(card.fontId) }}
               />
             </div>
             <div>
@@ -219,7 +220,7 @@ const CardForm: React.FC<CardFormProps> = ({ card, onChange }) => {
                 onChange={e => set('businessName', e.target.value)}
                 placeholder="Glow Studio"
                 size="large"
-                style={{ fontFamily: resolveFontStack(card.bodyFont) }}
+                style={{ fontFamily: bodyStack(card.fontId) }}
               />
             </div>
           </div>

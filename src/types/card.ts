@@ -1,6 +1,24 @@
-export type CardStyle = 'modern' | 'clean' | 'bold' | 'minimal' | 'neon' | 'profile' | 'split' | 'stacked' | 'handout';
+// Business-card styles ('modern' | 'clean' | 'bold' | 'minimal' | 'neon') were
+// cut in the shrink-to-real pass (docs/DIGITAL-CARD-SHRINK-TO-REAL-PLAN.md §1a):
+// a screen-only business card is a solved, valueless thing. What remains is the
+// contact cards (the real output) + the handout (spun off later, left in place).
+// Contact-card templates: the three originals (profile/split/stacked) + two
+// new "online identity graphic" layouts added in the shrink pass (§3):
+//   • type  — editorial, type-forward with a left accent spine (premium)
+//   • photo — large photo/initials hero anchoring, contact as a clean column
+// (A "mono" dark card was tried and cut — its name/behavior didn't cohere.)
+export type CardStyle =
+  | 'profile'
+  | 'split'
+  | 'stacked'
+  | 'type'
+  | 'photo'
+  | 'handout';
 
-export type CardSize = 'us-business' | 'eu-business' | 'square' | 'handout-4x6' | 'handout-5x7';
+// 'square' is the on-screen contact-card canvas (dimensionless in practice —
+// contact templates cap their own width). The two handout print sizes stay for
+// the handout, which still has a print use.
+export type CardSize = 'square' | 'handout-4x6' | 'handout-5x7';
 
 export type HandoutVariant = 'hero' | 'side' | 'corner';
 
@@ -46,16 +64,28 @@ export interface CardData {
   headlineColor: string;
   /** Optional override for the QR code color. Empty = accent. */
   qrColor: string;
-  /** Optional Google Font for the handout headline. Empty = template default. */
+  /** Optional Google Font for the handout headline. Empty = template default.
+   *  (Handout-only, legacy 7-font list. The handout is being spun into its own
+   *  tool later — left untouched per the shrink plan §1c.) */
   headlineFont: string;
   /** Optional Google Font for the handout sub-headline. */
   subheadlineFont: string;
   /** Optional Google Font for the handout blurb. */
   blurbFont: string;
-  /** Optional Google Font for the name on business + contact cards. */
-  nameFont: string;
-  /** Optional Google Font for body / secondary text on business + contact cards. */
-  bodyFont: string;
+
+  /**
+   * The contact card's typography, as a SHARED font-library pairing `id`
+   * (`@/lib/shared-fonts`). This is the interop key that travels into the Brand
+   * Board card blob so the card's fonts match the rest of the client's kit.
+   * Empty string = the library's default pairing. Replaces the old private
+   * `nameFont` / `bodyFont` string fields (still read once for migration).
+   */
+  fontId: string;
+
+  /** @deprecated Legacy name-font family string. Read only to migrate → fontId. */
+  nameFont?: string;
+  /** @deprecated Legacy body-font family string. Read only to migrate → fontId. */
+  bodyFont?: string;
 }
 
 export const emptyCard: CardData = {
@@ -76,9 +106,9 @@ export const emptyCard: CardData = {
   address: '',
   photo: '',
   accentColor: '#2D3748',
-  cardStyle: 'modern',
-  showInitials: true,
-  cardSize: 'us-business',
+  cardStyle: 'profile',
+  showInitials: false,
+  cardSize: 'square',
   showPrintGuides: false,
   headline: '',
   subheadline: '',
@@ -93,8 +123,7 @@ export const emptyCard: CardData = {
   headlineFont: '',
   subheadlineFont: '',
   blurbFont: '',
-  nameFont: '',
-  bodyFont: '',
+  fontId: '',
 };
 
 export const demoCard: CardData = {
@@ -115,9 +144,9 @@ export const demoCard: CardData = {
   address: '742 Elm Street, Suite 3, Portland, OR 97205',
   photo: '',
   accentColor: '#4A6741',
-  cardStyle: 'modern',
-  showInitials: true,
-  cardSize: 'us-business',
+  cardStyle: 'profile',
+  showInitials: false,
+  cardSize: 'square',
   showPrintGuides: false,
   headline: '',
   subheadline: '',
@@ -132,8 +161,7 @@ export const demoCard: CardData = {
   headlineFont: '',
   subheadlineFont: '',
   blurbFont: '',
-  nameFont: '',
-  bodyFont: '',
+  fontId: '',
 };
 
 export const demoHandout: Partial<CardData> = {
@@ -151,10 +179,8 @@ export const demoHandout: Partial<CardData> = {
   accentColor: '#4A6741',
 };
 
-export const BUSINESS_STYLES: CardStyle[] = ['modern', 'clean', 'bold', 'minimal', 'neon'];
-export const CONTACT_STYLES: CardStyle[] = ['profile', 'split', 'stacked'];
+export const CONTACT_STYLES: CardStyle[] = ['profile', 'split', 'stacked', 'type', 'photo'];
 export const HANDOUT_STYLES: CardStyle[] = ['handout'];
 
-export const isBusinessStyle = (s: CardStyle) => BUSINESS_STYLES.includes(s);
 export const isContactStyle = (s: CardStyle) => CONTACT_STYLES.includes(s);
 export const isHandoutStyle = (s: CardStyle) => HANDOUT_STYLES.includes(s);

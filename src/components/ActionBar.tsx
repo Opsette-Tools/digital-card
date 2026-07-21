@@ -11,7 +11,7 @@ import {
   AppstoreAddOutlined,
 } from '@ant-design/icons';
 import QRCode from 'qrcode';
-import { CardData, isBusinessStyle, isHandoutStyle } from '@/types/card';
+import { CardData, isHandoutStyle } from '@/types/card';
 import { getShareableUrl } from '@/lib/share';
 import { downloadVCard } from '@/lib/vcard';
 import { getDimensions } from '@/lib/print';
@@ -38,11 +38,11 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave, onReopen }
   const printCardRef = useRef<HTMLDivElement>(null);
   const { message } = AntApp.useApp();
   const dims = getDimensions(card.cardSize);
-  const isBusiness = isBusinessStyle(card.cardStyle);
   const isHandout = isHandoutStyle(card.cardStyle);
-  // Print-quality export is meaningful for anything that has a defined trim
-  // size — both business cards and handouts. Contact cards are share-only.
-  const printableForExport = isBusiness || isHandout;
+  // Print-quality export is meaningful only for the handout now (it has a defined
+  // trim size). Contact cards are share/paste-only (web PNG). Business cards — the
+  // other print target — were cut in the shrink-to-real pass (§1a).
+  const printableForExport = isHandout;
 
   const requireName = (): boolean => {
     if (!card.fullName) {
@@ -79,7 +79,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave, onReopen }
 
   const downloadImagePrint = async () => {
     if (!printableForExport) {
-      message.info('Print-quality export is only available for business cards and handouts');
+      message.info('Print-quality export is only available for the handout');
       return;
     }
     const container = document.createElement('div');
@@ -113,6 +113,13 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave, onReopen }
   // digital_card.png) and the .vcf (the "add to contacts" half), so the card
   // finally flows into the kit with no manual download. Reopen reads data.card.
   const exportToBrandBoard = async () => {
+    // The handout is a separate content model (headline/blurb/CTA), spun into
+    // its own tool later — it does NOT belong in the kit's card blob (§1c). Only
+    // contact cards flow to Brand Board.
+    if (isHandout) {
+      message.info('The handout isn’t part of the Brand Kit — switch to a contact card to export.');
+      return;
+    }
     if (!requireName()) return;
     setExporting(true);
     try {
@@ -244,15 +251,17 @@ const ActionBar: React.FC<ActionBarProps> = ({ card, cardRef, onSave, onReopen }
         </div>
       )}
 
-      <Button
-        icon={<AppstoreAddOutlined />}
-        onClick={exportToBrandBoard}
-        loading={exporting}
-        block
-        style={{ height: 40, marginTop: 8 }}
-      >
-        Export to Brand Board
-      </Button>
+      {!isHandout && (
+        <Button
+          icon={<AppstoreAddOutlined />}
+          onClick={exportToBrandBoard}
+          loading={exporting}
+          block
+          style={{ height: 40, marginTop: 8 }}
+        >
+          Export to Brand Board
+        </Button>
+      )}
 
       <div style={{ textAlign: 'center', marginTop: 6 }}>
         <Button type="link" size="small" onClick={() => setReopenOpen(true)} style={{ fontSize: 12 }}>

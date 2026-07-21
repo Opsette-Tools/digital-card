@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Space, Grid, theme as antdTheme, App as AntApp } from 'antd';
-import { CardData, emptyCard } from '@/types/card';
+import { CardData, emptyCard, isHandoutStyle } from '@/types/card';
 import { decodeCardFromHash } from '@/lib/share';
 import {
   readSeedFromUrl,
@@ -13,6 +13,8 @@ import {
 } from '@/lib/opsette-kit-link';
 import { initialCardFromSeed } from '@/lib/seed';
 import { fromKitJson, toKitJson } from '@/lib/brandKit';
+import { normalizeCard } from '@/lib/card-normalize';
+import { loadCardFont } from '@/lib/fonts';
 import { renderWebImage } from '@/lib/export';
 import { OpsetteHeader } from '@/components/opsette-header';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
@@ -48,8 +50,9 @@ const Index: React.FC = () => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        return { ...emptyCard, ...parsed };
+        // normalizeCard migrates a pre-shared-font card (nameFont/bodyFont →
+        // fontId) and coerces any cut business style onto a contact style.
+        return normalizeCard(JSON.parse(saved));
       }
       return { ...emptyCard };
     } catch {
@@ -76,6 +79,12 @@ const Index: React.FC = () => {
   useEffect(() => {
     clearLinkParams();
   }, []);
+
+  // Inject the selected pairing's Google Fonts <link> so the preview + export
+  // paint the real faces. Idempotent per href (loadPairing de-dupes).
+  useEffect(() => {
+    loadCardFont(card.fontId);
+  }, [card.fontId]);
 
   const handleSave = () => {
     // Don't persist to this device while embedded — editing a client's card in
@@ -107,6 +116,12 @@ const Index: React.FC = () => {
   // Outbound: bake the same PNG + .vcf blob "Export to Brand Board" produces and
   // post it back up. Targeted at the apex in prod, the dev parent locally.
   const saveToBrandBoard = async () => {
+    // The handout isn't part of the kit's card blob (§1c) — refuse to push one
+    // back up from the embed drawer.
+    if (isHandoutStyle(card.cardStyle)) {
+      message.info('The handout isn’t part of the Brand Kit — switch to a contact card first.');
+      return;
+    }
     setSaving(true);
     try {
       let image: string | undefined;
@@ -213,7 +228,7 @@ const Index: React.FC = () => {
             }}
           >
             <div className="animate-scale-in">
-              <CardPreview card={card} cardRef={cardRef} showGuides={card.showPrintGuides} sizeCap={640} />
+              <CardPreview card={card} cardRef={cardRef} sizeCap={640} />
             </div>
 
             <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>
@@ -237,7 +252,7 @@ const Index: React.FC = () => {
           </div>
 
           <div className="animate-scale-in" style={{ animationDelay: '0.05s' }}>
-            <CardPreview card={card} cardRef={cardRef} showGuides={card.showPrintGuides} />
+            <CardPreview card={card} cardRef={cardRef} />
           </div>
 
           <div className="animate-fade-in-up" style={{ ...surface, padding: 12, animationDelay: '0.1s' }}>

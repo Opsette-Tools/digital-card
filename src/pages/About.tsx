@@ -44,7 +44,7 @@ const About: React.FC = () => {
         <Typography>
           <Title level={5} style={{ marginBottom: 6 }}>1. Choose a style</Title>
           <Paragraph>
-            Pick from <Text strong>Business Card</Text> layouts (landscape, great for image export and printing) or <Text strong>Contact Card</Text> layouts (portrait, designed for sharing links digitally).
+            Pick a <Text strong>Contact Card</Text> layout (Profile, Split, or Stacked) — a clean identity graphic you can share as a link or drop into a post, slide, or page. Or switch to the <Text strong>Marketing Handout</Text> for a printable QR flyer.
           </Paragraph>
 
           <Title level={5} style={{ marginBottom: 6 }}>2. Fill in your details</Title>
@@ -67,7 +67,7 @@ const About: React.FC = () => {
           <ul style={{ paddingLeft: 18, marginTop: 0, marginBottom: 16 }}>
             <li><Text type="secondary">Link</Text> — copies a shareable URL that shows your card in the browser</li>
             <li><Text type="secondary">Image</Text> — downloads a PNG of your card for social media or printing</li>
-            <li><Text type="secondary">QR</Text> — generates a QR code that links to your card</li>
+            <li><Text type="secondary">QR</Text> — a scannable code that saves your contact straight to a phone</li>
             <li><Text type="secondary">vCard</Text> — downloads a .vcf file that adds your info (including photo) directly to someone's contacts</li>
           </ul>
 

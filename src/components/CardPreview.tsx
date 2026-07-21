@@ -1,92 +1,46 @@
 import React from 'react';
-import { CardData, isBusinessStyle, isHandoutStyle } from '@/types/card';
-import { MonogramCard, WordmarkCard, FullBleedCard, EditorialCard, DarkCard } from './cards/BusinessCards';
-import { ProfileCard, SplitCard, StackedCard } from './cards/VCardTemplates';
+import { CardData, isHandoutStyle } from '@/types/card';
+import { ProfileCard, SplitCard, StackedCard, TypeCard, PhotoCard } from './cards/VCardTemplates';
 import { HandoutCard } from './cards/HandoutCard';
 import { getDimensions, type Dimensions } from '@/lib/print';
 
 interface CardPreviewProps {
   card: CardData;
   cardRef?: React.RefObject<HTMLDivElement>;
-  showGuides?: boolean;
-  /** Override the on-screen size cap. Business cards default to 400 (the
-   * shorter side); handouts default to 540 (the longer side). Pass a larger
-   * value on desktop to use the extra horizontal room. */
+  /** Override the on-screen size cap. Contact cards default to 400 (their own
+   * max-width); handouts default to 540 (the longer side). Pass a larger value
+   * on desktop to use the extra horizontal room. */
   sizeCap?: number;
 }
 
 const templates: Record<string, React.FC<{ card: CardData; cardRef?: React.RefObject<HTMLDivElement>; dimensions?: Dimensions }>> = {
-  modern: MonogramCard,
-  clean: WordmarkCard,
-  bold: FullBleedCard,
-  minimal: EditorialCard,
-  neon: DarkCard,
   profile: ProfileCard,
   split: SplitCard,
   stacked: StackedCard,
+  type: TypeCard,
+  photo: PhotoCard,
   handout: HandoutCard,
 };
 
-const PrintGuides: React.FC<{ dimensions: Dimensions }> = ({ dimensions }) => {
-  const bleedPctW = (0.125 / dimensions.trimWIn) * 100;
-  const bleedPctH = (0.125 / dimensions.trimHIn) * 100;
-  const safePctW = (0.125 / dimensions.trimWIn) * 100;
-  const safePctH = (0.125 / dimensions.trimHIn) * 100;
-
-  return (
-    <div className="no-print" aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5 }}>
-      <div
-        style={{
-          position: 'absolute',
-          left: `${safePctW}%`,
-          right: `${safePctW}%`,
-          top: `${safePctH}%`,
-          bottom: `${safePctH}%`,
-          border: '1px dashed rgba(34, 197, 94, 0.7)',
-          borderRadius: 6,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: `-${bleedPctW}%`,
-          right: `-${bleedPctW}%`,
-          top: `-${bleedPctH}%`,
-          bottom: `-${bleedPctH}%`,
-          border: '1px dashed rgba(239, 68, 68, 0.55)',
-          borderRadius: 8,
-        }}
-      />
-    </div>
-  );
-};
-
-const CardPreview: React.FC<CardPreviewProps> = ({ card, cardRef, showGuides, sizeCap }) => {
-  const Template = templates[card.cardStyle] || MonogramCard;
+const CardPreview: React.FC<CardPreviewProps> = ({ card, cardRef, sizeCap }) => {
+  const Template = templates[card.cardStyle] || ProfileCard;
   const dims = getDimensions(card.cardSize);
-  const isBusiness = isBusinessStyle(card.cardStyle);
   const isHandout = isHandoutStyle(card.cardStyle);
-  // Handout templates and business templates both want dimensions to drive
-  // their aspect ratio. Contact templates are dimensionless.
-  const passDims = isBusiness || isHandout;
-  const guidesActive = !!showGuides && passDims && dims.showGuides;
 
-  // Handouts: anchor by the longer dimension so different print sizes stay
-  // proportional on screen (5×7 visibly larger than 4×6). Business cards
-  // anchor by width.
+  // Handouts anchor by the longer dimension so different print sizes stay
+  // proportional on screen (5×7 visibly larger than 4×6). Contact cards are
+  // dimensionless — they cap their own width (400) — and anchor by width.
   const handoutTargetLongPx = sizeCap ?? 540;
-  const businessWidthCap = sizeCap ?? 400;
+  const contactWidthCap = sizeCap ?? 400;
   const handoutWidthCap = isHandout
     ? Math.round(handoutTargetLongPx * (dims.trimWIn / Math.max(dims.trimWIn, dims.trimHIn)))
-    : businessWidthCap;
-  const widthCap = isHandout ? handoutWidthCap : businessWidthCap;
-  const bleedPad = guidesActive ? 16 : 0;
+    : contactWidthCap;
+  const widthCap = isHandout ? handoutWidthCap : contactWidthCap;
 
   return (
-    <div style={{ maxWidth: widthCap + bleedPad * 2, margin: '0 auto', width: '100%', padding: bleedPad, boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: widthCap, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       <div style={{ position: 'relative', width: '100%' }}>
-        <Template card={card} cardRef={cardRef} dimensions={passDims ? dims : undefined} />
-        {guidesActive && <PrintGuides dimensions={dims} />}
+        <Template card={card} cardRef={cardRef} dimensions={isHandout ? dims : undefined} />
       </div>
     </div>
   );
